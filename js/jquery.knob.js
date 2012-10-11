@@ -145,16 +145,22 @@
 
             (!this.o.displayInput) && this.$.hide();
 
-            this.$c = $('<canvas width="' +
-                            this.o.width + 'px" height="' +
-                            this.o.height + 'px"></canvas>');
-            this.c = this.$c[0].getContext("2d");
+            this.$c = $(document.createElement('canvas')).attr({
+                width: this.o.width,
+                height: this.o.height
+            });
 
             this.$
                 .wrap($('<div style="' + (this.o.inline ? 'display:inline;' : '') +
                         'width:' + this.o.width + 'px;height:' +
                         this.o.height + 'px;"></div>'))
                 .before(this.$c);
+
+            if (typeof G_vmlCanvasManager !== 'undefined') {
+                G_vmlCanvasManager.initElement(this.$c[0]);
+            }
+
+            this.c = this.$c[0].getContext("2d");
 
             if (this.v instanceof Object) {
                 this.cv = {};
@@ -182,13 +188,9 @@
 
         this._draw = function () {
 
-            // canvas pre-rendering
-            var d = true,
-                c = document.createElement('canvas');
+            var d = true;
 
-            c.width = s.o.width;
-            c.height = s.o.height;
-            s.g = c.getContext('2d');
+            s.g = s.c;
 
             s.clear();
 
@@ -196,9 +198,6 @@
             && (d = s.dH());
 
             (d !== false) && s.draw();
-
-            s.c.drawImage(c, 0, 0);
-            c = null;
         };
 
         this._touch = function (e) {
